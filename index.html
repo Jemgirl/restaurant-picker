@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Picker Wheel</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>🍴 Restaurant Picker Wheel</h1>
+
+      <!-- Controls -->
+      <div class="controls">
+        <div class="cuisine-control">
+          <label for="cuisine">🍽️ Cuisine Type:</label>
+          <select id="cuisine" class="cuisine-select">
+            <option value="all">🎲 Surprise Me! (All Cuisines)</option>
+            <optgroup label="Asian">
+              <option value="chinese">🥡 Chinese</option>
+              <option value="japanese">🍱 Japanese</option>
+              <option value="thai">🍜 Thai</option>
+              <option value="korean">🍛 Korean</option>
+              <option value="vietnamese">🍲 Vietnamese</option>
+              <option value="indian">🍛 Indian</option>
+              <option value="ramen">🍜 Ramen</option>
+              <option value="sushi">🍣 Sushi</option>
+            </optgroup>
+            <optgroup label="European">
+              <option value="italian">🍝 Italian</option>
+              <option value="french">🥐 French</option>
+              <option value="greek">🥙 Greek</option>
+              <option value="spanish">🥘 Spanish</option>
+              <option value="turkish">🥙 Turkish</option>
+            </optgroup>
+            <optgroup label="American">
+              <option value="american">🍔 American</option>
+              <option value="mexican">🌮 Mexican</option>
+              <option value="pizza">🍕 Pizza</option>
+              <option value="burger">🍔 Burger</option>
+              <option value="barbecue">🍖 BBQ</option>
+              <option value="steak_house">🥩 Steakhouse</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="mediterranean">🥙 Mediterranean</option>
+              <option value="seafood">🦞 Seafood</option>
+              <option value="brazilian">🥩 Brazilian</option>
+              <option value="ethiopian">🍛 Ethiopian</option>
+              <option value="middle_eastern">🥙 Middle Eastern</option>
+              <option value="vegan">🥗 Vegan</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="location-control">
+          <label for="zipcode">📍 Zip Code:</label>
+          <input
+            type="text"
+            id="zipcode"
+            placeholder="Enter zip (e.g., 78613) or leave blank"
+            maxlength="5"
+            pattern="[0-9]{5}"
+          />
+        </div>
+
+        <div class="distance-control">
+          <label for="distance">Search Radius:</label>
+          <input
+            type="range"
+            id="distance"
+            min="1"
+            max="25"
+            value="5"
+            step="1"
+          />
+          <span id="distance-display">5 miles</span>
+        </div>
+
+        <button id="fetch-btn" class="btn btn-primary">Find Restaurants</button>
+      </div>
+
+      <!-- Wheel Container -->
+      <div class="wheel-container">
+        <div class="wheel-pointer">▼</div>
+        <canvas id="wheel" width="500" height="500"></canvas>
+        <button id="spin-btn" class="btn btn-spin">SPIN THE WHEEL!</button>
+      </div>
+
+      <!-- Fireworks Canvas -->
+      <canvas id="fireworks" class="fireworks-canvas"></canvas>
+
+      <!-- Result Display -->
+      <div id="result" class="result hidden">
+        <h2>🎉 You're eating at:</h2>
+        <div id="result-name"></div>
+      </div>
+
+      <!-- Restaurant List -->
+      <div class="restaurant-list">
+        <h3>Current Restaurants (<span id="count">0</span>)</h3>
+        <div id="restaurants"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,378 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+  color: #333;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+  text-align: center;
+  color: #667eea;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+}
+
+/* Controls */
+.controls {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.cuisine-control {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.cuisine-control label {
+  font-weight: 600;
+  color: #555;
+  min-width: 120px;
+}
+
+.cuisine-select {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cuisine-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.cuisine-select option {
+  padding: 10px;
+}
+
+.cuisine-select optgroup {
+  font-weight: 700;
+  color: #667eea;
+}
+
+.location-control {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.location-control label {
+  font-weight: 600;
+  color: #555;
+}
+
+#zipcode {
+  flex: 1;
+  padding: 10px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+#zipcode:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+#zipcode::placeholder {
+  color: #aaa;
+  font-weight: 400;
+}
+
+.distance-control {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.distance-control label {
+  font-weight: 600;
+  color: #555;
+}
+
+#distance {
+  flex: 1;
+  height: 8px;
+  border-radius: 5px;
+  background: #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+#distance::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+}
+
+#distance::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+}
+
+#distance-display {
+  font-weight: 700;
+  color: #667eea;
+  min-width: 70px;
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-spin {
+  background: #f093fb;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  font-size: 20px;
+  padding: 15px 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  box-shadow: 0 8px 20px rgba(245, 87, 108, 0.4);
+}
+
+.btn-spin:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 12px 30px rgba(245, 87, 108, 0.6);
+}
+
+.btn-spin:active {
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+.btn-spin:disabled {
+  background: #0aa1d35e;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Wheel */
+.wheel-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  margin: 0 auto;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 40px;
+  color: #f5576c;
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+#wheel {
+  display: block;
+  margin: 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Fireworks Canvas */
+.fireworks-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  display: none;
+}
+
+.fireworks-canvas.active {
+  display: block;
+}
+
+/* Result */
+.result {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border-radius: 15px;
+  margin: 30px 0;
+  animation: slideIn 0.5s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.result.hidden {
+  display: none;
+}
+
+.result h2 {
+  margin-bottom: 15px;
+  font-size: 1.8em;
+}
+
+#result-name {
+  font-size: 2.5em;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Restaurant List */
+.restaurant-list {
+  margin-top: 40px;
+}
+
+.restaurant-list h3 {
+  color: #555;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+#restaurants {
+  display: grid;
+  gap: 10px;
+}
+
+.restaurant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.restaurant-item:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.restaurant-item span {
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-delete {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+  background: #ee5a52;
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+
+  .cuisine-control {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cuisine-control label {
+    min-width: auto;
+  }
+
+  .wheel-container {
+    width: 350px;
+    height: 350px;
+  }
+
+  #wheel {
+    width: 350px;
+    height: 350px;
+  }
+
+  h1 {
+    font-size: 1.8em;
+  }
+
+  .btn-spin {
+    font-size: 16px;
+    padding: 12px 30px;
+  }
+}
