@@ -106,16 +106,6 @@ const data = await response.json();
 restaurants = data.businesses.map((business) => business.name);
 ```
 
-## File Structure
-
-```
-restaurant-picker/
-├── index.html    # Main HTML structure
-├── style.css     # All styling and animations
-├── script.js     # Wheel logic, API calls, interactions
-└── README.md     # This file
-```
-
 ## Color Scheme
 
 - **Primary Purple:** #667eea
@@ -150,9 +140,5 @@ Works in all modern browsers:
 - Show restaurant details (address, rating, hours)
 - Support for city names and full addresses (not just zip codes)
 - Recent searches history
-
-## License
-
-Free to use and modify!
 
 Enjoy finding your next meal! 🍕🍔🌮
