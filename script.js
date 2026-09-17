@@ -27,6 +27,7 @@ const distanceDisplay = document.getElementById("distance-display");
 const resultDiv = document.getElementById("result");
 const resultName = document.getElementById("result-name");
 const spinAgainBtn = document.getElementById("spin-again-btn");
+const loadingModal = document.getElementById("loading-modal");
 const restaurantsDiv = document.getElementById("restaurants");
 const countSpan = document.getElementById("count");
 const fireworksCanvas = document.getElementById("fireworks");
@@ -161,40 +162,14 @@ function drawWelcomeMessage() {
   requestAnimationFrame(drawWelcomeMessage);
 }
 
-// Draw a spinner while restaurants are being fetched
-function drawLoadingMessage() {
-  if (!isLoading) return; // Stop if flag is false
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "#f8f9fa";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-  const time = Date.now() / 1000;
-
-  // Spinning arc
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, 100, time * 3, time * 3 + Math.PI * 1.5);
-  ctx.strokeStyle = "#667eea";
-  ctx.lineWidth = 8;
-  ctx.lineCap = "round";
-  ctx.stroke();
-
-  // Emoji
-  ctx.font = "60px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText("🔎", centerX, centerY + 20);
-
-  // Text
-  ctx.font = "bold 22px Arial";
-  ctx.fillStyle = "#667eea";
-  ctx.fillText("Searching nearby...", centerX, centerY + 150);
-
+// Show/hide the "searching" modal while restaurants are being fetched
+function showLoadingModal() {
+  loadingModal.classList.remove("hidden");
   spinBtn.disabled = true;
+}
 
-  requestAnimationFrame(drawLoadingMessage);
+function hideLoadingModal() {
+  loadingModal.classList.add("hidden");
 }
 
 // Cuisine dropdown handler
@@ -259,7 +234,7 @@ fetchBtn.addEventListener("click", async () => {
   wheelContainer.scrollIntoView({ behavior: "smooth", block: "center" });
   isAnimatingWelcome = false;
   isLoading = true;
-  drawLoadingMessage();
+  showLoadingModal();
 
   // Get coordinates from zip code (or use default)
   const coords = await getCoordinatesFromZip(zipcode);
@@ -309,6 +284,7 @@ fetchBtn.addEventListener("click", async () => {
     }
 
     isLoading = false;
+    hideLoadingModal();
 
     if (restaurants.length === 0) {
       const cuisineText =
@@ -329,6 +305,7 @@ fetchBtn.addEventListener("click", async () => {
     console.error("Error:", error);
     restaurants = [];
     isLoading = false;
+    hideLoadingModal();
     welcomeMessage = {
       emoji: "⚠️",
       title: "Something Went Wrong",

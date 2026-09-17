@@ -270,6 +270,55 @@ h1 {
   display: block;
 }
 
+/* Loading Modal */
+.loading-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.loading-modal-overlay.hidden {
+  display: none;
+}
+
+.loading-modal {
+  background: white;
+  border-radius: 15px;
+  padding: 40px 50px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.loading-hourglass {
+  font-size: 60px;
+  animation: hourglass-spin 1.5s linear infinite;
+}
+
+.loading-modal p {
+  margin-top: 15px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+@keyframes hourglass-spin {
+  0%,
+  40% {
+    transform: rotate(0deg);
+  }
+  60%,
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
 /* Result */
 .result {
   text-align: center;
