@@ -209,6 +209,25 @@ h1 {
   box-shadow: none;
 }
 
+.btn-spin-again {
+  background: white;
+  color: #764ba2;
+  margin-top: 20px;
+  font-size: 16px;
+  padding: 12px 30px;
+}
+
+.btn-spin-again:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-spin-again:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Wheel */
 .wheel-container {
   position: relative;
@@ -277,6 +296,17 @@ h1 {
   font-size: 2.5em;
   font-weight: 700;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#result-name a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.6);
+  text-underline-offset: 4px;
+}
+
+#result-name a:hover {
+  text-decoration-color: currentColor;
 }
 
 @keyframes slideIn {

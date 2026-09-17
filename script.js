@@ -3,10 +3,21 @@ let restaurants = [];
 let isSpinning = false;
 let selectedCuisine = "all"; // Default to "Surprise Me"
 let isAnimatingWelcome = false; // Track welcome animation state
+let isLoading = false; // Track loading animation state
+
+// Text shown on the welcome screen; swapped out for a "no results" message
+const DEFAULT_WELCOME_MESSAGE = {
+  emoji: "🍴",
+  title: "Ready to Spin!",
+  subtitle1: "Select options above and",
+  subtitle2: "click Find Restaurants",
+};
+let welcomeMessage = { ...DEFAULT_WELCOME_MESSAGE };
 
 // DOM Elements
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
+const wheelContainer = document.querySelector(".wheel-container");
 const spinBtn = document.getElementById("spin-btn");
 const fetchBtn = document.getElementById("fetch-btn");
 const cuisineSelect = document.getElementById("cuisine");
@@ -15,6 +26,7 @@ const distanceSlider = document.getElementById("distance");
 const distanceDisplay = document.getElementById("distance-display");
 const resultDiv = document.getElementById("result");
 const resultName = document.getElementById("result-name");
+const spinAgainBtn = document.getElementById("spin-again-btn");
 const restaurantsDiv = document.getElementById("restaurants");
 const countSpan = document.getElementById("count");
 const fireworksCanvas = document.getElementById("fireworks");
@@ -47,6 +59,7 @@ const colors = [
 // Initialize with sample restaurants
 function initializeApp() {
   // Show welcome message on canvas
+  welcomeMessage = { ...DEFAULT_WELCOME_MESSAGE };
   isAnimatingWelcome = true;
   drawWelcomeMessage();
 
@@ -113,7 +126,7 @@ function drawWelcomeMessage() {
   // Large emoji
   ctx.font = "80px Arial";
   ctx.textAlign = "center";
-  ctx.fillText("🍴", canvas.width / 2, canvas.height / 2 - 30);
+  ctx.fillText(welcomeMessage.emoji, canvas.width / 2, canvas.height / 2 - 30);
 
   // Main text with gradient
   const textGradient = ctx.createLinearGradient(
@@ -126,18 +139,18 @@ function drawWelcomeMessage() {
   textGradient.addColorStop(1, "#764ba2");
   ctx.fillStyle = textGradient;
   ctx.font = "bold 28px Arial";
-  ctx.fillText("Ready to Spin!", canvas.width / 2, canvas.height / 2 + 60);
+  ctx.fillText(welcomeMessage.title, canvas.width / 2, canvas.height / 2 + 60);
 
   // Subtitle
   ctx.font = "18px Arial";
   ctx.fillStyle = "#666";
   ctx.fillText(
-    "Select options above and",
+    welcomeMessage.subtitle1,
     canvas.width / 2,
     canvas.height / 2 + 95,
   );
   ctx.fillText(
-    "click Find Restaurants",
+    welcomeMessage.subtitle2,
     canvas.width / 2,
     canvas.height / 2 + 120,
   );
@@ -146,6 +159,42 @@ function drawWelcomeMessage() {
 
   // Animate the welcome screen
   requestAnimationFrame(drawWelcomeMessage);
+}
+
+// Draw a spinner while restaurants are being fetched
+function drawLoadingMessage() {
+  if (!isLoading) return; // Stop if flag is false
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#f8f9fa";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const time = Date.now() / 1000;
+
+  // Spinning arc
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, 100, time * 3, time * 3 + Math.PI * 1.5);
+  ctx.strokeStyle = "#667eea";
+  ctx.lineWidth = 8;
+  ctx.lineCap = "round";
+  ctx.stroke();
+
+  // Emoji
+  ctx.font = "60px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("🔎", centerX, centerY + 20);
+
+  // Text
+  ctx.font = "bold 22px Arial";
+  ctx.fillStyle = "#667eea";
+  ctx.fillText("Searching nearby...", centerX, centerY + 150);
+
+  spinBtn.disabled = true;
+
+  requestAnimationFrame(drawLoadingMessage);
 }
 
 // Cuisine dropdown handler
@@ -207,6 +256,11 @@ fetchBtn.addEventListener("click", async () => {
   fetchBtn.disabled = true;
   fetchBtn.textContent = "Searching...";
 
+  wheelContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+  isAnimatingWelcome = false;
+  isLoading = true;
+  drawLoadingMessage();
+
   // Get coordinates from zip code (or use default)
   const coords = await getCoordinatesFromZip(zipcode);
   const { lat, lng, location } = coords;
@@ -240,35 +294,47 @@ fetchBtn.addEventListener("click", async () => {
     const response = await fetch(url);
     const data = await response.json();
 
-    const names = data.elements
-      .map((el) => el.tags?.name)
-      .filter((name) => name);
+    const seen = new Set();
+    restaurants = [];
+    for (const el of data.elements) {
+      const name = el.tags?.name;
+      if (!name || seen.has(name)) continue;
+      seen.add(name);
 
-    restaurants = [...new Set(names)]; // Remove duplicates
+      const website = el.tags?.website || el.tags?.["contact:website"] || "";
+      const elLat = el.lat ?? el.center?.lat;
+      const elLng = el.lon ?? el.center?.lon;
+
+      restaurants.push({ name, website, lat: elLat, lng: elLng });
+    }
+
+    isLoading = false;
 
     if (restaurants.length === 0) {
       const cuisineText =
         selectedCuisine === "all" ? "" : ` ${selectedCuisine}`;
-      alert(
-        `No${cuisineText} restaurants found near ${location}. Try increasing the radius or choosing a different cuisine!`,
-      );
-      // Keep empty to show the welcome message
-      restaurants = [];
+      welcomeMessage = {
+        emoji: "🔍",
+        title: "No Matches Found",
+        subtitle1: `No${cuisineText} restaurants near ${location}.`,
+        subtitle2: "Try a wider radius or another cuisine.",
+      };
       isAnimatingWelcome = true;
       drawWelcomeMessage();
     } else {
       updateRestaurantList();
       drawWheel();
-      const cuisineText =
-        selectedCuisine === "all" ? "" : ` ${selectedCuisine}`;
-      alert(
-        `Found ${restaurants.length}${cuisineText} restaurants near ${location}!`,
-      );
     }
   } catch (error) {
     console.error("Error:", error);
-    alert("Error fetching data. Please try again.");
     restaurants = [];
+    isLoading = false;
+    welcomeMessage = {
+      emoji: "⚠️",
+      title: "Something Went Wrong",
+      subtitle1: "Couldn't fetch restaurants.",
+      subtitle2: "Please try again.",
+    };
     isAnimatingWelcome = true;
     drawWelcomeMessage();
   }
@@ -336,7 +402,7 @@ function drawWheel() {
     ctx.font = "bold 16px Arial";
     ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
     ctx.shadowBlur = 3;
-    ctx.fillText(restaurant, radius * 0.65, 5);
+    ctx.fillText(restaurant.name, radius * 0.65, 5);
     ctx.restore();
   });
 
@@ -353,12 +419,13 @@ function drawWheel() {
 }
 
 // Spin the wheel
-spinBtn.addEventListener("click", () => {
+function spinWheel() {
   if (isSpinning || restaurants.length === 0) return;
 
   isSpinning = true;
   resultDiv.classList.add("hidden");
   spinBtn.disabled = true;
+  spinAgainBtn.disabled = true;
 
   // Random spins between 5-10 full rotations plus random position
   const spins = 5 + Math.random() * 5;
@@ -390,11 +457,25 @@ spinBtn.addEventListener("click", () => {
       showResult();
       isSpinning = false;
       spinBtn.disabled = false;
+      spinAgainBtn.disabled = false;
     }
   }
 
   animate();
-});
+}
+
+spinBtn.addEventListener("click", spinWheel);
+spinAgainBtn.addEventListener("click", spinWheel);
+
+// Build a link to the restaurant's website, falling back to a Google search
+function getRestaurantLink(restaurant) {
+  if (restaurant.website) {
+    return restaurant.website;
+  }
+
+  const query = encodeURIComponent(restaurant.name);
+  return `https://www.google.com/search?q=${query}`;
+}
 
 // Show result
 function showResult() {
@@ -406,8 +487,15 @@ function showResult() {
     Math.floor(normalizedRotation / sliceAngle) % restaurants.length;
   const winner = restaurants[winningIndex];
 
-  resultName.textContent = winner;
+  resultName.innerHTML = "";
+  const link = document.createElement("a");
+  link.href = getRestaurantLink(winner);
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = winner.name;
+  resultName.appendChild(link);
   resultDiv.classList.remove("hidden");
+  resultDiv.scrollIntoView({ behavior: "smooth", block: "center" });
 
   // Launch fireworks!
   launchFireworks();
@@ -423,7 +511,7 @@ function updateRestaurantList() {
     item.className = "restaurant-item";
 
     const name = document.createElement("span");
-    name.textContent = restaurant;
+    name.textContent = restaurant.name;
 
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "btn-delete";
@@ -433,6 +521,7 @@ function updateRestaurantList() {
       updateRestaurantList();
       if (restaurants.length === 0) {
         // Restart welcome animation if all restaurants deleted
+        welcomeMessage = { ...DEFAULT_WELCOME_MESSAGE };
         isAnimatingWelcome = true;
         drawWelcomeMessage();
       } else {
